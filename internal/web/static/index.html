@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Edge HY · EdgeX Console</title>
+  <link rel="stylesheet" href="/app.css">
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">⬡&nbsp; EDGE HY</div>
+      <div class="subtitle">EdgeX Foundry · Management Console</div>
+      <nav id="nav" class="nav"></nav>
+      <div class="sidebar-footer">
+        <button id="refresh" class="btn ghost block" type="button">↻ 刷新数据</button>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="breadcrumb" id="breadcrumb">EdgeX Foundry</div>
+          <h1 id="page-title">控制台概览</h1>
+        </div>
+        <div id="conn" class="conn"></div>
+      </header>
+      <section id="content" class="content"></section>
+    </main>
+  </div>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-body">
+      <header class="modal-head">
+        <h2 id="modal-title"></h2>
+        <button id="modal-close" class="btn ghost" type="button">✕</button>
+      </header>
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <div id="toasts" class="toasts"></div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

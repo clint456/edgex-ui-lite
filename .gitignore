@@ -1,0 +1,5 @@
+/edge-hy-console
+/bin/
+/dist/
+*.log
+.DS_Store
