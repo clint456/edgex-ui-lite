@@ -19,9 +19,9 @@ type MetaKind struct {
 
 // Kinds maps a UI key to the matching core-metadata resource.
 var Kinds = map[string]MetaKind{
-	"device":  {"device", "device", "device", "devices", http.MethodPatch},
-	"service": {"service", "deviceservice", "service", "services", http.MethodPatch},
-	"profile": {"profile", "deviceprofile", "profile", "profiles", http.MethodPut},
+	"node":    {"node", "node", "node", "nodes", http.MethodPatch},
+	"service": {"service", "nodeservice", "service", "services", http.MethodPatch},
+	"profile": {"profile", "profile", "profile", "profiles", http.MethodPut},
 	"watcher": {"watcher", "provisionwatcher", "provisionWatcher", "provisionWatchers", http.MethodPatch},
 }
 
@@ -37,8 +37,8 @@ func (c *Client) ListMetadata(
 ) (map[string]any, error) {
 	cfg := c.store.Get()
 	path := "/api/v3/" + kind.Resource + "/all"
-	if kind.Key == "device" && (filter == "service" || filter == "profile") && value != "" {
-		path = "/api/v3/device/" + filter + "/name/" + url.PathEscape(value)
+	if kind.Key == "node" && (filter == "service" || filter == "profile") && value != "" {
+		path = "/api/v3/node/" + filter + "/name/" + url.PathEscape(value)
 	}
 	raw, err := c.roundTrip(ctx, http.MethodGet, cfg.MetadataURL, path, pageQuery(offset, limit), "", nil)
 	if err != nil {
@@ -105,13 +105,13 @@ func (c *Client) DeleteMetadata(ctx context.Context, kind MetaKind, name string)
 	return err
 }
 
-// UploadProfile sends a device profile as a YAML file (multipart uploadfile).
+// UploadProfile sends a node profile as a YAML file (multipart uploadfile).
 func (c *Client) UploadProfile(
 	ctx context.Context, filename, yamlText string, update bool,
 ) error {
 	cfg := c.store.Get()
 	if filename == "" {
-		filename = "device-profile.yaml"
+		filename = "node-profile.yaml"
 	}
 	var buffer bytes.Buffer
 	writer := multipart.NewWriter(&buffer)
@@ -130,6 +130,6 @@ func (c *Client) UploadProfile(
 		method = http.MethodPut
 	}
 	_, err = c.roundTrip(ctx, method, cfg.MetadataURL,
-		"/api/v3/deviceprofile/uploadfile", nil, writer.FormDataContentType(), buffer.Bytes())
+		"/api/v3/profile/uploadfile", nil, writer.FormDataContentType(), buffer.Bytes())
 	return err
 }

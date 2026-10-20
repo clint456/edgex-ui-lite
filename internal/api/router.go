@@ -46,9 +46,9 @@ func NewRouter(store *config.Store, client *edgex.Client) (*gin.Engine, error) {
 		api.GET("/metadata/:kind/:name", s.getMetadata)
 		api.DELETE("/metadata/:kind/:name", s.deleteMetadata)
 
-		api.GET("/devices/:name/commands", s.deviceCommands)
-		api.GET("/devices/:name/commands/:command", s.executeCommandGet)
-		api.PUT("/devices/:name/commands/:command", s.executeCommandPut)
+		api.GET("/nodes/:name/commands", s.commands)
+		api.GET("/nodes/:name/commands/:command", s.executeCommandGet)
+		api.PUT("/nodes/:name/commands/:command", s.executeCommandPut)
 
 		api.GET("/data/:kind", s.listData)
 		api.GET("/data/:kind/count", s.countData)

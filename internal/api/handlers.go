@@ -115,7 +115,7 @@ func (s *server) getServices(c *gin.Context) {
 }
 
 var overviewLabels = map[string]string{
-	"device":  "设备",
+	"node":    "设备",
 	"service": "设备服务",
 	"profile": "设备模型",
 	"watcher": "自动发现",
@@ -127,11 +127,11 @@ func (s *server) getOverview(c *gin.Context) {
 	ctx := c.Request.Context()
 
 	type job struct {
-		key   string
-		run   func() (int, error)
+		key string
+		run func() (int, error)
 	}
 	jobs := make([]job, 0, 6)
-	for _, key := range []string{"device", "service", "profile", "watcher"} {
+	for _, key := range []string{"node", "service", "profile", "watcher"} {
 		kind, _ := edgex.LookupKind(key)
 		captured := kind
 		jobs = append(jobs, job{key, func() (int, error) { return s.client.CountMetadata(ctx, captured) }})
@@ -306,10 +306,10 @@ func bindRecord(c *gin.Context) (map[string]any, bool) {
 	return record, true
 }
 
-// --- device commands -----------------------------------------------------
+// --- node commands -----------------------------------------------------
 
-func (s *server) deviceCommands(c *gin.Context) {
-	commands, err := s.client.DeviceCommands(c.Request.Context(), c.Param("name"))
+func (s *server) commands(c *gin.Context) {
+	commands, err := s.client.Commands(c.Request.Context(), c.Param("name"))
 	if err != nil {
 		s.fail(c, err)
 		return
@@ -352,7 +352,7 @@ func (s *server) listData(c *gin.Context) {
 		return
 	}
 	result, err := s.client.ListData(
-		c.Request.Context(), kind, c.Query("device"),
+		c.Request.Context(), kind, c.Query("node"),
 		atoiDefault(c.Query("offset"), 0), atoiDefault(c.Query("limit"), 20),
 	)
 	if err != nil {
@@ -422,7 +422,7 @@ func (s *server) deleteMapping(c *gin.Context) {
 
 func (s *server) lookupMapping(c *gin.Context) {
 	point := map[string]string{
-		"device":   c.Query("device"),
+		"node":     c.Query("node"),
 		"profile":  c.Query("profile"),
 		"resource": c.Query("resource"),
 	}
@@ -470,7 +470,7 @@ func (s *server) deleteMappingScope(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"ok": true})
 }
 
-// --- device profile YAML -------------------------------------------------
+// --- node profile YAML -------------------------------------------------
 
 func (s *server) profileYAML(c *gin.Context) {
 	kind, _ := edgex.LookupKind("profile")
@@ -501,7 +501,7 @@ func (s *server) uploadProfile(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "YAML 内容不能为空"})
 		return
 	}
-	filename := "device-profile.yaml"
+	filename := "node-profile.yaml"
 	if strings.TrimSpace(req.Name) != "" {
 		filename = strings.TrimSpace(req.Name) + ".yaml"
 	}

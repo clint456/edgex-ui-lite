@@ -17,14 +17,14 @@ func DataKindValid(kind string) bool {
 	return ok
 }
 
-// ListData returns a page of events or readings, optionally filtered by device.
+// ListData returns a page of events or readings, optionally filtered by node.
 func (c *Client) ListData(
-	ctx context.Context, kind, device string, offset, limit int,
+	ctx context.Context, kind, node string, offset, limit int,
 ) (map[string]any, error) {
 	cfg := c.store.Get()
 	path := "/api/v3/" + kind + "/all"
-	if device != "" {
-		path = "/api/v3/" + kind + "/device/name/" + url.PathEscape(device)
+	if node != "" {
+		path = "/api/v3/" + kind + "/node/name/" + url.PathEscape(node)
 	}
 	raw, err := c.roundTrip(ctx, http.MethodGet, cfg.DataURL, path, pageQuery(offset, limit), "", nil)
 	if err != nil {

@@ -69,7 +69,7 @@ func (c *Client) LookupMapping(
 	cfg := c.store.Get()
 	side := mappingSide(direction)
 	query := url.Values{}
-	query.Set(side+"DeviceName", point["device"])
+	query.Set(side+"NodeName", point["node"])
 	query.Set(side+"ProfileName", point["profile"])
 	query.Set(side+"ResourceName", point["resource"])
 	raw, err := c.roundTrip(ctx, http.MethodGet, cfg.MappingsURL,
@@ -89,7 +89,7 @@ func (c *Client) BatchMappings(
 	entries := make([]map[string]string, 0, len(points))
 	for _, point := range points {
 		entries = append(entries, map[string]string{
-			side + "DeviceName":   point["device"],
+			side + "NodeName":     point["node"],
 			side + "ProfileName":  point["profile"],
 			side + "ResourceName": point["resource"],
 		})

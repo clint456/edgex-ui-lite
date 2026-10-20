@@ -59,15 +59,15 @@ bash run.sh
 | GET | `/api/health` | 各服务 ping 健康检查 |
 | GET | `/api/services` | core-keeper 注册服务列表 |
 | GET | `/api/overview` | 概览计数 + 健康 |
-| GET/POST/PUT | `/api/metadata/:kind` | 列表 / 新建 / 更新（kind: device、service、profile、watcher） |
+| GET/POST/PUT | `/api/metadata/:kind` | 列表 / 新建 / 更新（kind: node、service、profile、watcher） |
 | GET/DELETE | `/api/metadata/:kind/:name` | 详情 / 删除 |
-| GET | `/api/devices/:name/commands` | 设备命令元数据 |
-| GET/PUT | `/api/devices/:name/commands/:command` | 执行命令 |
+| GET | `/api/nodes/:name/commands` | 设备命令元数据 |
+| GET/PUT | `/api/nodes/:name/commands/:command` | 执行命令 |
 | GET | `/api/data/:kind` | 事件 / 读数列表（kind: event、reading） |
 | GET | `/api/data/:kind/count` | 事件 / 读数总数 |
 | GET/POST/PUT | `/api/mappings` | 映射列表 / 新建 / 更新 |
 | DELETE | `/api/mappings/:id` | 删除映射 |
-| GET | `/api/mappings/lookup` | 单点查询（direction/device/profile/resource） |
+| GET | `/api/mappings/lookup` | 单点查询（direction/node/profile/resource） |
 | POST | `/api/mappings/batch` | 批量查询 |
 | DELETE | `/api/mappings/scope/:side/:kind/:name` | 按范围删除 |
 | GET | `/api/system/metrics` `/api/system/config` | sys-mgmt-agent 指标 / 配置 |

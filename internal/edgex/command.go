@@ -6,27 +6,27 @@ import (
 	"net/url"
 )
 
-// DeviceCommands returns the command metadata for a device (core-command).
-func (c *Client) DeviceCommands(ctx context.Context, device string) (any, error) {
+// Commands returns the command metadata for a node (core-command).
+func (c *Client) Commands(ctx context.Context, node string) (any, error) {
 	cfg := c.store.Get()
 	raw, err := c.roundTrip(ctx, http.MethodGet, cfg.CommandURL,
-		"/api/v3/device/name/"+url.PathEscape(device), nil, "", nil)
+		"/api/v3/node/name/"+url.PathEscape(node), nil, "", nil)
 	if err != nil {
 		return nil, err
 	}
 	payload := asMap(raw)
-	if core, ok := payload["deviceCoreCommand"]; ok {
+	if core, ok := payload["nodeCoreCommand"]; ok {
 		return core, nil
 	}
 	return payload, nil
 }
 
-// ExecuteCommand issues a GET or PUT against a device command.
+// ExecuteCommand issues a GET or PUT against a node command.
 func (c *Client) ExecuteCommand(
-	ctx context.Context, device, command, method string, body any,
+	ctx context.Context, node, command, method string, body any,
 ) (any, error) {
 	cfg := c.store.Get()
-	path := "/api/v3/device/name/" + url.PathEscape(device) + "/" + url.PathEscape(command)
+	path := "/api/v3/node/name/" + url.PathEscape(node) + "/" + url.PathEscape(command)
 	if method == http.MethodGet {
 		query := url.Values{}
 		query.Set("ds-pushevent", "false")

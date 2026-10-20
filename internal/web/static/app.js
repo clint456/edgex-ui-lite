@@ -11,7 +11,7 @@ const NAV = [
     id: "metadata",
     label: "⬡  元数据",
     children: [
-      ["device", "设备"],
+      ["node", "设备"],
       ["service", "设备服务"],
       ["profile", "设备模型"],
       ["watcher", "自动发现"],
@@ -29,17 +29,17 @@ const NAV = [
   { id: "settings", label: "⚙  连接设置" },
 ];
 
-const META_LABEL = { device: "设备", service: "设备服务", profile: "设备模型", watcher: "自动发现" };
+const META_LABEL = { node: "设备", service: "设备服务", profile: "设备模型", watcher: "自动发现" };
 
 const META_COLUMNS = {
-  device: ["name", "description", "serviceName", "profileName", "adminState", "operatingState"],
+  node: ["name", "description", "serviceName", "profileName", "adminState", "operatingState"],
   service: ["name", "baseAddress", "adminState", "labels"],
   profile: ["name", "manufacturer", "model", "description"],
   watcher: ["name", "serviceName", "adminState"],
 };
 
 const META_FIELDS = {
-  device: [
+  node: [
     { key: "name", label: "设备名称", type: "text" },
     { key: "description", label: "描述", type: "text" },
     { key: "serviceName", label: "设备服务名称", type: "text" },
@@ -62,8 +62,8 @@ const META_FIELDS = {
     { key: "description", label: "描述", type: "text" },
     { key: "manufacturer", label: "厂商", type: "text" },
     { key: "model", label: "型号", type: "text" },
-    { key: "deviceResources", label: "设备资源 deviceResources（JSON 数组）", type: "json", fallback: [] },
-    { key: "deviceCommands", label: "设备命令 deviceCommands（JSON 数组）", type: "json", fallback: [] },
+    { key: "resources", label: "设备资源 resources（JSON 数组）", type: "json", fallback: [] },
+    { key: "commands", label: "设备命令 commands（JSON 数组）", type: "json", fallback: [] },
   ],
   watcher: [
     { key: "name", label: "名称", type: "text" },
@@ -72,8 +72,8 @@ const META_FIELDS = {
     { key: "identifiers", label: "匹配标识 identifiers（JSON）", type: "json", fallback: {} },
     { key: "blockingIdentifiers", label: "排除标识 blockingIdentifiers（JSON）", type: "json", fallback: {} },
     {
-      key: "discoveredDevice",
-      label: "发现设备 discoveredDevice（JSON）",
+      key: "discoveredNode",
+      label: "发现设备 discoveredNode（JSON）",
       type: "json",
       fallback: { profileName: "", adminState: "UNLOCKED" },
     },
@@ -81,10 +81,10 @@ const META_FIELDS = {
 };
 
 const MAPPING_FIELDS = [
-  { key: "northDeviceName", label: "北向设备", type: "text" },
+  { key: "northNodeName", label: "北向设备", type: "text" },
   { key: "northProfileName", label: "北向模型", type: "text" },
   { key: "northResourceName", label: "北向资源", type: "text" },
-  { key: "southDeviceName", label: "南向设备", type: "text" },
+  { key: "southNodeName", label: "南向设备", type: "text" },
   { key: "southProfileName", label: "南向模型", type: "text" },
   { key: "southResourceName", label: "南向资源", type: "text" },
   { key: "metadata", label: "元数据 metadata（JSON）", type: "json", fallback: {} },
@@ -295,7 +295,7 @@ async function route() {
   const content = clear($("#content"));
   try {
     if (section === "system") await renderSystem(content);
-    else if (section === "metadata") await renderMetadata(content, sub || "device");
+    else if (section === "metadata") await renderMetadata(content, sub || "node");
     else if (section === "data") await renderData(content, sub || "event");
     else if (section === "mappings") await renderMappings(content);
     else if (section === "settings") await renderSettings(content);
@@ -443,7 +443,7 @@ async function renderMetadata(root, kind) {
       load().catch((error) => toast(error.message, "error"));
     });
     const filter = el("select");
-    for (const option of kind === "device" ? ["", "service", "profile"] : [""]) {
+    for (const option of kind === "node" ? ["", "service", "profile"] : [""]) {
       filter.append(el("option", { value: option, text: option || "全部" }));
     }
     filter.value = offsetRef.filter;
@@ -457,10 +457,10 @@ async function renderMetadata(root, kind) {
 
     const toolbar = el("div", { class: "toolbar" }, [
       el("label", { class: "field" }, [el("span", { text: "筛选当前页" }), search]),
-      ...(kind === "device"
+      ...(kind === "node"
         ? [el("label", { class: "field" }, [el("span", { text: "服务端筛选" }), filter])]
         : []),
-      ...(kind === "device"
+      ...(kind === "node"
         ? [el("label", { class: "field" }, [el("span", { text: "精确名称" }), valueInput])]
         : []),
       el("label", { class: "field" }, [el("span", { text: "每页条数" }), size]),
@@ -497,7 +497,7 @@ async function renderMetadata(root, kind) {
       const buttons = [
         el("button", { class: "btn small", type: "button", text: "编辑", onclick: () => openEdit(row) }),
       ];
-      if (kind === "device") {
+      if (kind === "node") {
         buttons.push(
           el("button", { class: "btn small", type: "button", text: "命令", onclick: () => openCommands(row.name) }),
         );
@@ -586,11 +586,11 @@ async function renderMetadata(root, kind) {
     }
   }
 
-  async function openCommands(device) {
+  async function openCommands(node) {
     const box = el("div", { class: "mono muted", text: "加载中…" });
-    openModal("设备命令 · " + device, box);
+    openModal("设备命令 · " + node, box);
     try {
-      const data = await api(`/devices/${encodeURIComponent(device)}/commands`);
+      const data = await api(`/nodes/${encodeURIComponent(node)}/commands`);
       const commands = (data && data.coreCommands) || [];
       clear(box);
       if (!commands.length) {
@@ -611,7 +611,7 @@ async function renderMetadata(root, kind) {
                   text: "执行 GET",
                   onclick: async () => {
                     try {
-                      const result = await api(`/devices/${encodeURIComponent(device)}/commands/${encodeURIComponent(command.name)}`);
+                      const result = await api(`/nodes/${encodeURIComponent(node)}/commands/${encodeURIComponent(command.name)}`);
                       toast("GET 成功", "ok");
                       openModal("命令结果", el("pre", { class: "mono", text: JSON.stringify(result, null, 2) }));
                     } catch (error) {
@@ -629,7 +629,7 @@ async function renderMetadata(root, kind) {
                     text: "执行 PUT",
                     onclick: async () => {
                       try {
-                        const result = await api(`/devices/${encodeURIComponent(device)}/commands/${encodeURIComponent(command.name)}`, {
+                        const result = await api(`/nodes/${encodeURIComponent(node)}/commands/${encodeURIComponent(command.name)}`, {
                           method: "PUT",
                           body: JSON.parse(bodyInput.value || "{}"),
                         });
@@ -689,29 +689,29 @@ function readingChart(records) {
 async function renderData(root, kind) {
   const label = kind === "event" ? "事件" : "读数";
   setTitle(label, `EdgeX Foundry > 数据中心 > ${label}`);
-  const state = { device: "", offset: 0, limit: 20 };
+  const state = { node: "", offset: 0, limit: 20 };
   const host = el("div");
   root.append(host);
 
   async function load() {
     const query = new URLSearchParams({
-      device: state.device,
+      node: state.node,
       offset: String(state.offset),
       limit: String(state.limit),
     });
     const data = await api(`/data/${kind}?${query.toString()}`);
     const items = data.items || [];
     clear(host);
-    const deviceInput = el("input", { type: "text", value: state.device, placeholder: "设备名称" });
+    const nodeInput = el("input", { type: "text", value: state.node, placeholder: "设备名称" });
     host.append(
       el("div", { class: "toolbar" }, [
-        el("label", { class: "field" }, [el("span", { text: "设备名称（服务端精确查询）" }), deviceInput]),
+        el("label", { class: "field" }, [el("span", { text: "设备名称（服务端精确查询）" }), nodeInput]),
         el("button", {
           class: "btn",
           type: "button",
           text: "查询",
           onclick: () => {
-            state.device = deviceInput.value;
+            state.node = nodeInput.value;
             state.offset = 0;
             load().catch((error) => toast(error.message, "error"));
           },
@@ -729,8 +729,8 @@ async function renderData(root, kind) {
     );
     host.append(el("div", { class: "muted", text: `共 ${data.totalCount} 条 · 当前显示 ${items.length} 条` }));
     const columns = kind === "event"
-      ? ["id", "deviceName", "profileName", "sourceName", "origin"]
-      : ["id", "deviceName", "resourceName", "valueType", "value", "origin"];
+      ? ["id", "nodeName", "profileName", "sourceName", "origin"]
+      : ["id", "nodeName", "resourceName", "valueType", "value", "origin"];
     host.append(el("div", { class: "panel" }, table(columns, items)));
     if (kind === "reading") {
       const chart = readingChart(items);
@@ -745,13 +745,13 @@ async function renderData(root, kind) {
 /* mappings                                                           */
 /* ------------------------------------------------------------------ */
 
-const MAPPING_FILTERS = ["all", "north/device", "north/profile", "south/device", "south/profile"];
+const MAPPING_FILTERS = ["all", "north/node", "north/profile", "south/node", "south/profile"];
 
 function mappingToForm(mapping) {
   const record = { metadata: mapping.metadata || {} };
   for (const side of ["north", "south"]) {
     const point = mapping[side + "Point"] || {};
-    record[side + "DeviceName"] = point[side + "DeviceName"] || "";
+    record[side + "NodeName"] = point[side + "NodeName"] || "";
     record[side + "ProfileName"] = point[side + "ProfileName"] || "";
     record[side + "ResourceName"] = point[side + "ResourceName"] || "";
   }
@@ -760,7 +760,7 @@ function mappingToForm(mapping) {
 
 function formToMapping(record, id) {
   const side = (name) => ({
-    [name + "DeviceName"]: record[name + "DeviceName"],
+    [name + "NodeName"]: record[name + "NodeName"],
     [name + "ProfileName"]: record[name + "ProfileName"],
     [name + "ResourceName"]: record[name + "ResourceName"],
   });
@@ -884,7 +884,7 @@ async function renderMappings(root) {
     for (const option of ["forward", "reverse"]) {
       direction.append(el("option", { value: option, text: option === "forward" ? "北向 → 南向" : "南向 → 北向" }));
     }
-    const device = el("input", { type: "text" });
+    const node = el("input", { type: "text" });
     const profile = el("input", { type: "text" });
     const resource = el("input", { type: "text" });
     const result = el("div", { class: "mono muted", text: "尚未查询。" });
@@ -892,7 +892,7 @@ async function renderMappings(root) {
       "查询映射",
       el("div", {}, [
         el("label", { class: "field" }, [el("span", { text: "方向" }), direction]),
-        el("label", { class: "field" }, [el("span", { text: "设备名称" }), device]),
+        el("label", { class: "field" }, [el("span", { text: "设备名称" }), node]),
         el("label", { class: "field" }, [el("span", { text: "模型名称" }), profile]),
         el("label", { class: "field" }, [el("span", { text: "资源名称" }), resource]),
         el("button", {
@@ -900,14 +900,14 @@ async function renderMappings(root) {
           type: "button",
           text: "查询",
           onclick: async () => {
-            if (!device.value.trim() || !profile.value.trim() || !resource.value.trim()) {
+            if (!node.value.trim() || !profile.value.trim() || !resource.value.trim()) {
               result.textContent = "请填写设备、模型和资源名称。";
               return;
             }
             try {
               const query = new URLSearchParams({
                 direction: direction.value,
-                device: device.value,
+                node: node.value,
                 profile: profile.value,
                 resource: resource.value,
               });

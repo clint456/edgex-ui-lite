@@ -41,7 +41,7 @@ func validateRecord(kind string, record map[string]any, creating bool) error {
 		}
 	}
 	switch kind {
-	case "device":
+	case "node":
 		if creating {
 			for _, field := range []string{"serviceName", "profileName", "protocols"} {
 				if isEmpty(record[field]) {
@@ -56,14 +56,14 @@ func validateRecord(kind string, record map[string]any, creating bool) error {
 		}
 	case "watcher":
 		if creating {
-			for _, field := range []string{"serviceName", "identifiers", "discoveredDevice"} {
+			for _, field := range []string{"serviceName", "identifiers", "discoveredNode"} {
 				if isEmpty(record[field]) {
 					return fmt.Errorf("%s 不能为空", field)
 				}
 			}
 		}
 	case "profile":
-		for _, field := range []string{"deviceResources", "deviceCommands"} {
+		for _, field := range []string{"resources", "commands"} {
 			if value, ok := record[field]; ok {
 				if _, isList := value.([]any); !isList {
 					return fmt.Errorf("%s 必须为数组", field)

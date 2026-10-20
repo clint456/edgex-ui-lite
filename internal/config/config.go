@@ -11,13 +11,13 @@ import (
 
 // Config points directly at the EdgeX microservices (no edgex-ui-go proxy).
 type Config struct {
-	MetadataURL string `json:"metadataUrl"`
-	DataURL     string `json:"dataUrl"`
-	CommandURL  string `json:"commandUrl"`
-	MappingsURL string `json:"mappingsUrl"`
-	KeeperURL   string `json:"keeperUrl"`
-	SystemURL   string `json:"systemUrl"`
-	Token       string `json:"token,omitempty"`
+	MetadataURL string  `json:"metadataUrl"`
+	DataURL     string  `json:"dataUrl"`
+	CommandURL  string  `json:"commandUrl"`
+	MappingsURL string  `json:"mappingsUrl"`
+	KeeperURL   string  `json:"keeperUrl"`
+	SystemURL   string  `json:"systemUrl"`
+	Token       string  `json:"token,omitempty"`
 	TimeoutSec  float64 `json:"timeoutSec"`
 }
 
